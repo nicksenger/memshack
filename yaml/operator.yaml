@@ -1,0 +1,63 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mcrouter-operator
+  name: mcrouter-operator
+spec:
+  selector:
+    matchLabels:
+      app: mcrouter-operator
+  template:
+    metadata:
+      labels:
+        app: mcrouter-operator
+    spec:
+      serviceAccountName: mcrouter-operator
+      containers:
+        - image: operator-rs:latest
+          imagePullPolicy: IfNotPresent
+          name: mcrouter-operator
+          ports:
+          - containerPort: 3000
+            name: https
+            protocol: TCP
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mcrouter-operator
+  labels:
+    app: mcrouter-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: mcrouter-operator
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - pods
+  verbs: ["*"]
+- apiGroups: ["events.k8s.io"]
+  resources: ["events"]
+  verbs: ["create"]
+- apiGroups: ["example.dev"]
+  resources: ["*"]
+  verbs: ["get", "list", "watch", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: mcrouter-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: mcrouter-operator
+subjects:
+- apiGroup: ''
+  kind: ServiceAccount
+  name: mcrouter-operator
+  namespace: default

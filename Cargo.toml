@@ -1,0 +1,16 @@
+[workspace]
+resolver = "2"
+members = [
+    "controller",
+    "crd",
+]
+
+[workspace.dependencies]
+futures = "0.3"
+kube = "0.87"
+k8s-openapi = "0.20"
+schemars = "0.8"
+serde = "1.0"
+serde_json = "1.0"
+thiserror = "1.0"
+tokio = "1.34"
