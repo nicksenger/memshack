@@ -10,4 +10,4 @@ kube = { workspace = true, features = ["derive"] }
 k8s-openapi = { workspace = true, features = ["v1_26"] }
 schemars = { workspace = true, features = ["chrono"] }
 serde = { workspace = true, features = ["derive"] }
-serde_json = { workspace = true }
+serde_json.workspace = true

@@ -89,9 +89,9 @@ spec:
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: mcrouters.example.com
+  name: mcrouters.example.mcrouter.com
 spec:
-  group: example.com
+  group: example.mcrouter.com
   names:
     categories: []
     kind: Mcrouter
@@ -111,6 +111,11 @@ spec:
               mcrouter_image:
                 default: mcrouter/mcrouter
                 type: string
+              mcrouter_pool_size:
+                default: 2
+                format: uint
+                minimum: 0.0
+                type: integer
               mcrouter_port:
                 default: 5000
                 format: uint
@@ -119,22 +124,21 @@ spec:
               memcached_image:
                 default: memcached:1.6-alpine
                 type: string
-              memcached_pool_size:
-                default: 3
-                format: uint
-                minimum: 0.0
-                type: integer
               memcached_port:
                 default: 11211
                 format: uint
                 minimum: 0.0
                 type: integer
-              pool_setup:
-                default: replicated
-                enum:
-                - replicated
-                - sharded
-                type: string
+              num_replicas:
+                default: 2
+                format: uint
+                minimum: 0.0
+                type: integer
+              num_shards:
+                default: 3
+                format: uint
+                minimum: 0.0
+                type: integer
             type: object
           status:
             nullable: true

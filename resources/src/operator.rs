@@ -1,11 +1,9 @@
-use k8s_openapi::{
-    api::{
-        apps::{self, v1::DeploymentSpec},
-        core::v1::{Container, ContainerPort, PodSpec, PodTemplateSpec, ServiceAccount},
-        rbac::v1::{PolicyRule, Role, RoleBinding, RoleRef, Subject},
-    },
-    apimachinery::pkg::apis::meta::v1::LabelSelector,
+use k8s_openapi::api::apps::{self, v1::DeploymentSpec};
+use k8s_openapi::api::core::v1::{
+    Container, ContainerPort, PodSpec, PodTemplateSpec, ServiceAccount,
 };
+use k8s_openapi::api::rbac::v1::{PolicyRule, Role, RoleBinding, RoleRef, Subject};
+use k8s_openapi::apimachinery::pkg::apis::meta::v1::LabelSelector;
 use kube::core::ObjectMeta;
 
 pub fn deployment() -> apps::v1::Deployment {

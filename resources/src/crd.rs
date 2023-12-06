@@ -5,7 +5,7 @@ use kube::CustomResource;
 
 #[derive(CustomResource, Deserialize, Serialize, Clone, Debug, JsonSchema)]
 #[kube(
-    group = "example.com",
+    group = "example.mcrouter.com",
     version = "v1",
     kind = "Mcrouter",
     namespaced,
@@ -20,10 +20,12 @@ pub struct McrouterSpec {
     pub mcrouter_port: usize,
     #[serde(default = "default_memcached_port")]
     pub memcached_port: usize,
-    #[serde(default = "default_pool_size")]
-    pub memcached_pool_size: usize,
-    #[serde(default)]
-    pub pool_setup: PoolSetup,
+    #[serde(default = "default_mcrouter_pool_size")]
+    pub mcrouter_pool_size: usize,
+    #[serde(default = "default_num_shards")]
+    pub num_shards: usize,
+    #[serde(default = "default_num_replicas")]
+    pub num_replicas: usize,
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug, Default, JsonSchema)]
@@ -55,6 +57,14 @@ fn default_memcached_port() -> usize {
     11211
 }
 
-fn default_pool_size() -> usize {
+fn default_mcrouter_pool_size() -> usize {
+    2
+}
+
+fn default_num_shards() -> usize {
     3
+}
+
+fn default_num_replicas() -> usize {
+    2
 }
