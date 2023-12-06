@@ -156,10 +156,10 @@ dependencies = [
 name = "controller"
 version = "0.1.0"
 dependencies = [
- "crd",
  "futures",
  "k8s-openapi",
  "kube",
+ "resources",
  "serde",
  "serde_json",
  "serde_yaml",
@@ -182,17 +182,6 @@ name = "core-foundation-sys"
 version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e496a50fda8aacccc86d7529e2c1e0892dbd0f898a6b5645b5561b89c3210efa"
-
-[[package]]
-name = "crd"
-version = "0.1.0"
-dependencies = [
- "k8s-openapi",
- "kube",
- "schemars",
- "serde",
- "serde_json",
-]
 
 [[package]]
 name = "darling"
@@ -936,6 +925,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4722d768eff46b75989dd134e5c353f0d6296e5aaa3132e776cbdb56be7731aa"
 dependencies = [
  "bitflags 1.3.2",
+]
+
+[[package]]
+name = "resources"
+version = "0.1.0"
+dependencies = [
+ "k8s-openapi",
+ "kube",
+ "schemars",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

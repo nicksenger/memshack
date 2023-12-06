@@ -2,7 +2,7 @@
 resolver = "2"
 members = [
     "controller",
-    "crd",
+    "resources",
 ]
 
 [workspace.dependencies]

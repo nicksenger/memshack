@@ -12,7 +12,7 @@ use kube::Client;
 use std::sync::Arc;
 use tokio::time::Duration;
 
-use crd::{Mcrouter, McrouterStatus};
+use resources::crd::{Mcrouter, McrouterStatus};
 
 pub static WORKLOAD_FINALIZER: &str = "workload.example.dev";
 
@@ -89,35 +89,6 @@ pub async fn reconcile(workload: Arc<Mcrouter>, ctx: Arc<Data>) -> Result<Action
         .unwrap_or_else(|| McrouterStatus::default())
         .pods
         .len();
-    if current_workloads < workload.spec.replicas {
-        let mut new_pods = Vec::<String>::new();
-        for i in current_workloads..workload.spec.replicas {
-            let mut pod_name = String::from("workload-pod-");
-            pod_name.push_str(name);
-            pod_name.push_str("-");
-            pod_name.push_str(&i.to_string());
-            let pod = create_pod(&pod_name, &namespace, oref.clone());
-            let res = pods
-                .patch(
-                    &pod_name,
-                    &PatchParams::apply("workload-Controller"),
-                    &Patch::Apply(pod.clone()),
-                )
-                .await
-                .map_err(Error::PodCreationFailed);
-            println!("{:?}", res);
-            match res {
-                Ok(_) => new_pods.push(pod_name),
-                Err(e) => println!("Pod Creation Failed {:?}", e),
-            }
-        }
-        let update_status = json!({
-            "status": McrouterStatus { pods: new_pods }
-        });
-        workloads
-            .patch_status(name, &PatchParams::default(), &Patch::Merge(&update_status))
-            .await;
-    }
 
     finalizer(&workloads, WORKLOAD_FINALIZER, workload, |event| async {
         match event {

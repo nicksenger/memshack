@@ -1,6 +1,6 @@
 # Memshack
 
-WIP: this is not currently functional because I got distracted with learning neural network stuff for some other work
+WIP: this is not currently functional
 
 ## Goals
 

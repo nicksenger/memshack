@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-crd = { path = "../crd" }
+resources = { path = "../resources" }
 futures = { workspace = true }
 kube = { workspace = true, features = ["runtime"] }
 k8s-openapi = { workspace = true, features = ["v1_26"] }
@@ -16,6 +16,6 @@ thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 
 [build-dependencies]
-crd = { path = "../crd" }
+resources = { path = "../resources" }
 kube = { workspace = true }
 serde_yaml = "0.9"

@@ -2,6 +2,16 @@ use kube::CustomResourceExt;
 
 fn main() {
     let dir = std::env::var("CARGO_MANIFEST_DIR").expect("manifest directory");
-    let crd = serde_yaml::to_string(&crd::Mcrouter::crd()).expect("CRD yaml");
-    std::fs::write(&format!("{dir}/../yaml/crd.yaml"), crd).expect("write CRD");
+
+    let crd = serde_yaml::to_string(&resources::crd::Mcrouter::crd()).expect("CRD yaml");
+    let deployment =
+        serde_yaml::to_string(&resources::operator::deployment()).expect("Deployment yaml");
+    let service_account = serde_yaml::to_string(&resources::operator::service_account())
+        .expect("Service Account yaml");
+    let role_binding =
+        serde_yaml::to_string(&resources::operator::role_binding()).expect("Role Binding yaml");
+    let role = serde_yaml::to_string(&resources::operator::role()).expect("Role yaml");
+
+    let yaml = vec![role, role_binding, service_account, deployment, crd].join("---\n");
+    std::fs::write(&format!("{dir}/../yaml/operator.yaml"), yaml).expect("write yaml");
 }

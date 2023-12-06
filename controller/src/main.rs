@@ -12,7 +12,7 @@ use std::sync::Arc;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = Client::try_default().await?;
 
-    let wrkld = Api::<crd::Mcrouter>::all(client.clone());
+    let wrkld = Api::<resources::crd::Mcrouter>::all(client.clone());
     let podapi = Api::<Pod>::all(client.clone());
 
     Controller::new(wrkld, watcher::Config::default())
