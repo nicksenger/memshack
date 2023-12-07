@@ -2,8 +2,7 @@ use roperator::config::{ChildConfig, OperatorConfig};
 use roperator::k8s_types::apps::v1::{Deployment, StatefulSet};
 use roperator::k8s_types::core::v1::Service;
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() {
     if std::env::var("RUST_LOG").is_err() {
         std::env::set_var("RUST_LOG", "roperator=info,warn");
     }

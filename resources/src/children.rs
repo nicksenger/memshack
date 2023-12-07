@@ -1,2 +1,2 @@
-pub mod root;
+pub mod gateway;
 pub mod shard;

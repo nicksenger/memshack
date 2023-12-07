@@ -7,13 +7,13 @@ use crate::MEMCACHED_PORT;
 
 #[derive(CustomResource, Deserialize, Serialize, Clone, Debug, JsonSchema)]
 #[kube(
-    group = "example.mcrouter.com",
+    group = "example.memshack.com",
     version = "v1",
-    kind = "Mcrouter",
+    kind = "Memshack",
     namespaced,
-    status = "McrouterStatus"
+    status = "MemshackStatus"
 )]
-pub struct McrouterSpec {
+pub struct MemshackSpec {
     #[serde(default = "default_mcrouter_image")]
     pub mcrouter_image: String,
     #[serde(default = "default_memcached_image")]
@@ -28,7 +28,7 @@ pub struct McrouterSpec {
     pub num_replicas: usize,
 }
 
-impl Mcrouter {
+impl Memshack {
     pub fn validate(&self) -> Result<(), anyhow::Error> {
         if self.spec.mcrouter_port == MEMCACHED_PORT {
             anyhow::bail!("mcrouter_port must not be {}!", MEMCACHED_PORT);
@@ -39,13 +39,14 @@ impl Mcrouter {
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug, Default, JsonSchema)]
-pub struct McrouterStatus {
-    pub pods: Vec<String>,
+pub struct MemshackStatus {
+    pub message: String,
+    pub phase: String,
 }
 
 fn default_mcrouter_image() -> String {
     // TODO: push an image to hub for this
-    "jamescarr/mcrouter:latest".to_string()
+    "mcrouter/mcrouter:latest".to_string()
 }
 
 fn default_memcached_image() -> String {

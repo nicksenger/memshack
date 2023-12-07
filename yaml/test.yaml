@@ -1,0 +1,9 @@
+apiVersion: example.memshack.com/v1
+kind: Memshack
+metadata:
+  namespace: default
+  name: test
+spec:
+  mcrouter_pool_size: 2
+  num_replicas: 2
+  num_shards: 2

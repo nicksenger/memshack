@@ -1,13 +1,16 @@
-use k8s_openapi::api::{
-    apps::v1::{Deployment, DeploymentSpec},
-    core::v1::{
-        Container, ContainerPort, PodSpec, PodTemplateSpec, Service, ServicePort, ServiceSpec,
+use k8s_openapi::{
+    api::{
+        apps::v1::{Deployment, DeploymentSpec},
+        core::v1::{
+            Container, ContainerPort, PodSpec, PodTemplateSpec, Service, ServicePort, ServiceSpec,
+        },
     },
+    apimachinery::pkg::apis::meta::v1::LabelSelector,
 };
 use kube::core::ObjectMeta;
 use serde_json::json;
 
-pub struct RootDeployment<'a> {
+pub struct GatewayDeployment<'a> {
     pub namespace: &'a str,
     pub name: &'a str,
     pub mcrouter_pool_size: usize,
@@ -16,7 +19,7 @@ pub struct RootDeployment<'a> {
     pub shard_names: Vec<String>,
 }
 
-impl<'a> RootDeployment<'a> {
+impl<'a> GatewayDeployment<'a> {
     pub fn definition(self) -> Deployment {
         Deployment {
             metadata: ObjectMeta {
@@ -26,10 +29,23 @@ impl<'a> RootDeployment<'a> {
             },
             spec: Some(DeploymentSpec {
                 replicas: Some(self.mcrouter_pool_size as i32),
+                selector: LabelSelector {
+                    match_labels: Some(
+                        [(self.name.to_string(), "gateway".to_string())]
+                            .into_iter()
+                            .collect(),
+                    ),
+                    ..Default::default()
+                },
                 template: PodTemplateSpec {
                     metadata: Some(ObjectMeta {
                         name: Some(format!("{}-pod", self.name)),
                         namespace: Some(self.namespace.to_string()),
+                        labels: Some(
+                            [(self.name.to_string(), "gateway".to_string())]
+                                .into_iter()
+                                .collect(),
+                        ),
                         ..Default::default()
                     }),
                     spec: Some(PodSpec {
@@ -44,7 +60,10 @@ impl<'a> RootDeployment<'a> {
                             command: Some(
                                 [
                                     "mcrouter".to_string(),
-                                    format!("--config-str='{}'", self.config_json()),
+                                    format!("--config-str={}", self.config_json()),
+                                    "--asynclog-disable".to_string(),
+                                    "--async-dir".to_string(),
+                                    "/".to_string(),
                                     "-p".to_string(),
                                     self.mcrouter_port.to_string(),
                                 ]
@@ -54,7 +73,7 @@ impl<'a> RootDeployment<'a> {
                             ..Default::default()
                         }],
                         ..Default::default()
-                    })
+                    }),
                 },
                 ..Default::default()
             }),
@@ -84,13 +103,13 @@ impl<'a> RootDeployment<'a> {
     }
 }
 
-pub struct RootService<'a> {
+pub struct GatewayService<'a> {
     pub namespace: &'a str,
     pub name: &'a str,
     pub port: usize,
 }
 
-impl<'a> RootService<'a> {
+impl<'a> GatewayService<'a> {
     pub fn definition(self) -> Service {
         Service {
             metadata: ObjectMeta {
@@ -101,7 +120,7 @@ impl<'a> RootService<'a> {
             spec: Some(ServiceSpec {
                 type_: Some("ClusterIP".to_string()),
                 selector: Some(
-                    [("app.kubernetes.io/name".to_string(), self.name.to_string())]
+                    [(self.name.to_string(), "gateway".to_string())]
                         .into_iter()
                         .collect(),
                 ),

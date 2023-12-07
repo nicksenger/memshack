@@ -1,8 +1,11 @@
-use k8s_openapi::api::{
-    apps::v1::{StatefulSet, StatefulSetSpec},
-    core::v1::{
-        Container, ContainerPort, PodSpec, PodTemplateSpec, Service, ServicePort, ServiceSpec,
+use k8s_openapi::{
+    api::{
+        apps::v1::{StatefulSet, StatefulSetSpec},
+        core::v1::{
+            Container, ContainerPort, PodSpec, PodTemplateSpec, Service, ServicePort, ServiceSpec,
+        },
     },
+    apimachinery::pkg::apis::meta::v1::LabelSelector,
 };
 use kube::core::ObjectMeta;
 use serde_json::json;
@@ -29,10 +32,23 @@ impl<'a> ShardStatefulSet<'a> {
             },
             spec: Some(StatefulSetSpec {
                 replicas: Some(self.num_replicas as i32),
+                selector: LabelSelector {
+                    match_labels: Some(
+                        [(self.name.to_string(), "replica".to_string())]
+                            .into_iter()
+                            .collect(),
+                    ),
+                    ..Default::default()
+                },
                 template: PodTemplateSpec {
                     metadata: Some(ObjectMeta {
                         name: Some(format!("{}-pod", self.name)),
                         namespace: Some(self.namespace.to_string()),
+                        labels: Some(
+                            [(self.name.to_string(), "replica".to_string())]
+                                .into_iter()
+                                .collect(),
+                        ),
                         ..Default::default()
                     }),
                     spec: Some(PodSpec {
@@ -48,7 +64,10 @@ impl<'a> ShardStatefulSet<'a> {
                                 command: Some(
                                     [
                                         "mcrouter".to_string(),
-                                        format!("--config-str='{}'", self.config_json()),
+                                        format!("--config-str={}", self.config_json()),
+                                        "--asynclog-disable".to_string(),
+                                        "--async-dir".to_string(),
+                                        "/".to_string(),
                                         "-p".to_string(),
                                         self.mcrouter_port.to_string(),
                                     ]
@@ -59,7 +78,7 @@ impl<'a> ShardStatefulSet<'a> {
                             },
                             Container {
                                 name: "memcached".to_string(),
-                                image: Some(self.mcrouter_image.to_string()),
+                                image: Some(self.memcached_image.to_string()),
                                 ports: Some(vec![ContainerPort {
                                     container_port: MEMCACHED_PORT as i32,
                                     protocol: Some("TCP".to_string()),
@@ -69,7 +88,7 @@ impl<'a> ShardStatefulSet<'a> {
                             },
                         ],
                         ..Default::default()
-                    })
+                    }),
                 },
                 ..Default::default()
             }),
@@ -127,7 +146,7 @@ impl<'a> ShardService<'a> {
             spec: Some(ServiceSpec {
                 type_: Some("ClusterIP".to_string()),
                 selector: Some(
-                    [("app.kubernetes.io/name".to_string(), self.name.to_string())]
+                    [(self.name.to_string(), "replica".to_string())]
                         .into_iter()
                         .collect(),
                 ),

@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
-  name: mcrouter-operator
+  name: memshack-operator
 rules:
 - apiGroups:
   - ''
@@ -27,89 +27,92 @@ rules:
 - apiGroups:
   - apps
   resourceNames:
-  - mcrouter-operator
+  - memshack-operator
   resources:
   - deployments/finalizers
   verbs:
   - update
 - apiGroups:
-  - memcached.example.com
+  - example.memcached.com
   resources:
   - '*'
   verbs:
   - '*'
 - apiGroups:
-  - mcrouter.example.com
+  - example.memshack.com
   resources:
   - '*'
-  - mcrouters
+  - memshacks
   verbs:
   - '*'
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
-  name: mcrouter-operator
+  name: memshack-operator
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: mcrouter-operator
+  kind: ClusterRole
+  name: memshack-operator
 subjects:
 - kind: ServiceAccount
-  name: mcrouter-operator
+  name: memshack-operator
+  namespace: default
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: mcrouter-operator
+  name: memshack-operator
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mcrouter-operator
+  name: memshack-operator
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
-      name: mcrouter-operator
+      name: memshack-operator
   template:
     metadata:
-      name: mcrouter-operator
+      labels:
+        name: memshack-operator
+      name: memshack-operator
     spec:
       containers:
-      - image: mcrouter-operator:latest
+      - image: memshack-operator:latest
         imagePullPolicy: Never
         name: operator
         ports:
         - containerPort: 3000
           name: https
           protocol: TCP
-      serviceAccountName: mcrouter-operator
+      serviceAccountName: memshack-operator
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: mcrouters.example.mcrouter.com
+  name: memshacks.example.memshack.com
 spec:
-  group: example.mcrouter.com
+  group: example.memshack.com
   names:
     categories: []
-    kind: Mcrouter
-    plural: mcrouters
+    kind: Memshack
+    plural: memshacks
     shortNames: []
-    singular: mcrouter
+    singular: memshack
   scope: Namespaced
   versions:
   - additionalPrinterColumns: []
     name: v1
     schema:
       openAPIV3Schema:
-        description: Auto-generated derived type for McrouterSpec via `CustomResource`
+        description: Auto-generated derived type for MemshackSpec via `CustomResource`
         properties:
           spec:
             properties:
               mcrouter_image:
-                default: jamescarr/mcrouter:latest
+                default: mcrouter/mcrouter:latest
                 type: string
               mcrouter_pool_size:
                 default: 2
@@ -138,16 +141,17 @@ spec:
           status:
             nullable: true
             properties:
-              pods:
-                items:
-                  type: string
-                type: array
+              message:
+                type: string
+              phase:
+                type: string
             required:
-            - pods
+            - message
+            - phase
             type: object
         required:
         - spec
-        title: Mcrouter
+        title: Memshack
         type: object
     served: true
     storage: true
