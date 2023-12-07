@@ -6,6 +6,7 @@ members = [
 ]
 
 [workspace.dependencies]
+anyhow = "1.0"
 futures = "0.3"
 kube = "0.87"
 k8s-openapi = "0.20"

@@ -12,6 +12,6 @@ fn main() {
         serde_yaml::to_string(&resources::operator::role_binding()).expect("Role Binding yaml");
     let role = serde_yaml::to_string(&resources::operator::role()).expect("Role yaml");
 
-    let yaml = vec![role, role_binding, service_account, deployment, crd].join("---\n");
-    std::fs::write(&format!("{dir}/../yaml/operator.yaml"), yaml).expect("write yaml");
+    let yaml = [role, role_binding, service_account, deployment, crd].join("---\n");
+    std::fs::write(format!("{dir}/../yaml/operator.yaml"), yaml).expect("write yaml");
 }

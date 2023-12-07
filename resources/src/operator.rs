@@ -75,8 +75,7 @@ pub fn role_binding() -> RoleBinding {
             kind: "Role".to_string(),
             name: "mcrouter-operator".to_string(),
             api_group: "rbac.authorization.k8s.io".to_string(),
-        },
-        ..Default::default()
+        }
     }
 }
 
@@ -146,7 +145,6 @@ pub fn role() -> Role {
                 verbs: vec!["*".to_string()],
                 ..Default::default()
             },
-        ]),
-        ..Default::default()
+        ])
     }
 }

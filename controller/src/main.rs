@@ -1,4 +1,3 @@
-use controller;
 use roperator::config::{ChildConfig, OperatorConfig};
 use roperator::k8s_types::apps::v1::{Deployment, StatefulSet};
 use roperator::k8s_types::core::v1::Service;

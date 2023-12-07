@@ -109,7 +109,7 @@ spec:
           spec:
             properties:
               mcrouter_image:
-                default: mcrouter/mcrouter
+                default: jamescarr/mcrouter:latest
                 type: string
               mcrouter_pool_size:
                 default: 2
@@ -124,11 +124,6 @@ spec:
               memcached_image:
                 default: memcached:1.6-alpine
                 type: string
-              memcached_port:
-                default: 11211
-                format: uint
-                minimum: 0.0
-                type: integer
               num_replicas:
                 default: 2
                 format: uint
