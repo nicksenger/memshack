@@ -119,6 +119,7 @@ impl<'a> GatewayService<'a> {
             },
             spec: Some(ServiceSpec {
                 type_: Some("ClusterIP".to_string()),
+                cluster_ip: Some(String::new()),
                 selector: Some(
                     [(self.name.to_string(), "gateway".to_string())]
                         .into_iter()

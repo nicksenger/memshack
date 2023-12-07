@@ -18,6 +18,10 @@ serde_json = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 
+[dev-dependencies]
+bb8 = "0.8"
+bb8-memcached = "0.5"
+
 [build-dependencies]
 resources = { path = "../resources" }
 kube.workspace = true

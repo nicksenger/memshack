@@ -32,6 +32,7 @@ impl<'a> ShardStatefulSet<'a> {
             },
             spec: Some(StatefulSetSpec {
                 replicas: Some(self.num_replicas as i32),
+                service_name: format!("{}-headless", self.name),
                 selector: LabelSelector {
                     match_labels: Some(
                         [(self.name.to_string(), "replica".to_string())]
@@ -103,7 +104,7 @@ impl<'a> ShardStatefulSet<'a> {
                 "servers": (0..self.num_replicas)
                     .map(|replica_idx| {
                         format!(
-                            "{}-{}.{}.{}.svc.cluster.local:{}",
+                            "{}-{}.{}-headless.{}.svc.cluster.local:{}",
                             self.name,
                             replica_idx,
                             self.name,
@@ -136,15 +137,20 @@ pub struct ShardService<'a> {
 }
 
 impl<'a> ShardService<'a> {
-    pub fn definition(self) -> Service {
+    pub fn definition(self, headless: bool) -> Service {
         Service {
             metadata: ObjectMeta {
-                name: Some(self.name.to_string()),
+                name: Some(if headless {
+                    format!("{}-headless", self.name)
+                } else {
+                    self.name.to_string()
+                }),
                 namespace: Some(self.namespace.to_string()),
                 ..Default::default()
             },
             spec: Some(ServiceSpec {
                 type_: Some("ClusterIP".to_string()),
+                cluster_ip: if headless { None } else { Some(String::new()) },
                 selector: Some(
                     [(self.name.to_string(), "replica".to_string())]
                         .into_iter()
